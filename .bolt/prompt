@@ -1,0 +1,65 @@
+USER RULES (global)
+
+Sprache & Format: Deutsch. Antworte strukturiert mit: Was gebaut wurde → Wie testen → Akzeptanzkriterien → Nächste Schritte.
+
+Vollständigkeit: Keine Platzhalter/TODOs. Wenn etwas unklar ist: sinnvolle Defaults treffen und ADR anlegen.
+
+Fehlerpolitik: Bei Konflikten Projekt-Regeln > User-Regeln. Bei Build-/Type-Fehlern sofort stoppen und Fix vorschlagen.
+
+Tests nach JEDEM Prompt automatisch ausführen & reporten:
+npm run typecheck && npm run lint && npm test -- --watchAll=false
+Wenn RN-App betroffen: npx expo start --clear + Smokes (iOS/Android Sim).
+
+Datenquellen-Modus respektieren: EXPO_PUBLIC_DATASOURCE=seed|mock|live – nie “mixen” ohne Schalter.
+
+Security/PII: Keine Secrets im Repo; Env-Schema validieren; PII filtern.
+
+PROJEKT-REGELN (inkl. Addendum)
+Tech & Architektur
+
+App: React Native + TypeScript, Expo SDK 54 (iOS & Android).
+
+State: React Query (Server-State), Zustand (Domain-State).
+
+Navigation: React Navigation (Tabs+Stacks).
+
+Architektur: Clean Architecture, Feature-Slices:
+app/ (composition) · core/ (kernel, ports) · features/ (adventure, quests, packs, location, enrichment, inventory, profile) · shared/ (ui, tokens, utils).
+
+DI: tsyringe. Wichtig: tslib@^2.6.2 pinnen.
+
+Storage: MMKV (+ optional SQLite) für Caches/Seeds.
+
+I18n: i18next (de/en).
+
+Design-System: Zentrale Design-Tokens (Farben, Typo, Spacing, Radius, Elevation), UI-Primitives (Card, Button, Text, Badge, Progress, Modal, Tabs, Sheet). Rarity-Frames/Badges (Common/Rare/Epic/Legendary).
+
+Packs & Karten: Gacha mit garantierter Rare, Pity-Timer, Seeded RNG; Karten besitzen Buff-Effekte (z. B. City-XP +10–25 %) mit Dauer/Cooldown; Pre-Quest-Picker + HUD-Timer.
+
+OSM/Wiki: Overpass API (live) → Normalizer/Mapper/Scorer → Distribution; Wikipedia/Wikidata Enrichment (Timeout/Backoff/Caching).
+
+Mini-Spiele (ohne Bewegung): OSM-basierte Trivia, Bilder-Puzzles, “Finde das Tag” usw.
+
+CI/CD: GitHub Actions (typecheck, lint, test, detox), EAS (dev/preview/prod).
+
+TS-Einstellungen: strict: true, bis P14 exactOptionalPropertyTypes: false (Fehlerlast senken), ab P14 auf true heben.
+
+Addendum (verbindlich – an JEDEN Prompt anhängen)
+
+A Vollständigkeit: Keine Platzhalter/TODOs. Unklare Punkte → sinnvolle Defaults + ADR.
+
+B Qualität & Tests: ≥80 % Kern-Coverage; Contract-Tests für Ports/Adapter; min. 1 Detox-E2E pro neuer Journey; Akzeptanzkriterien explizit erfüllen.
+
+C Performance & Offline: 60 FPS Ziel; Image-Preload; Caching + Request-Timeouts/Backoff; Offline-Pfade für Home/Minigames/Quests.
+
+D Privacy & Telemetrie: Opt-in Analytics; PII-Filter im Logger; keine Secrets.
+
+E Design-System: Tokens + Primitives nutzen; Rarity-Frames konsistent; AA-Kontrast.
+
+F Docs: ADRs für jede größere Entscheidung; README/ARCHITECTURE/SECURITY/CONTRIBUTING pflegen; QA-Playbooks.
+
+G Datenquellen-Schalter: seed|mock|live strikt einhalten, Fallbacks definieren.
+
+H Fehlerstopp: Bei roten Checks (type/lint/test/e2e) nicht weiterbauen – erst fixen.
+
+I Versions-Hygiene: Expo kompatible Versionen, tslib@^2.6, keine veralteten Globals (z. B. eas-cli nicht lokal).

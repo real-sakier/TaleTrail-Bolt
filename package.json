@@ -20,6 +20,8 @@
     "validate": "npm run typecheck && npm run lint:check && npm run format:check && npm run test -- --watchAll=false"
   },
   "dependencies": {
+    "expo": "^54.0.10",
+    "expo-status-bar": "^3.0.8",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

@@ -1,0 +1,17 @@
+A Vollständigkeit: Keine Platzhalter/TODOs. Unklare Punkte → sinnvolle Defaults + ADR.
+
+B Qualität & Tests: ≥80 % Kern-Coverage; Contract-Tests für Ports/Adapter; min. 1 Detox-E2E pro neuer Journey; Akzeptanzkriterien explizit erfüllen.
+
+C Performance & Offline: 60 FPS Ziel; Image-Preload; Caching + Request-Timeouts/Backoff; Offline-Pfade für Home/Minigames/Quests.
+
+D Privacy & Telemetrie: Opt-in Analytics; PII-Filter im Logger; keine Secrets.
+
+E Design-System: Tokens + Primitives nutzen; Rarity-Frames konsistent; AA-Kontrast.
+
+F Docs: ADRs für jede größere Entscheidung; README/ARCHITECTURE/SECURITY/CONTRIBUTING pflegen; QA-Playbooks.
+
+G Datenquellen-Schalter: seed|mock|live strikt einhalten, Fallbacks definieren.
+
+H Fehlerstopp: Bei roten Checks (type/lint/test/e2e) nicht weiterbauen – erst fixen.
+
+I Versions-Hygiene: Expo kompatible Versionen, tslib@^2.6, keine veralteten Globals (z. B. eas-cli nicht lokal).

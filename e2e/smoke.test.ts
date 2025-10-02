@@ -10,7 +10,9 @@ describe('Smoke Test', () => {
   });
 
   it('should show welcome screen', async () => {
-    await detoxExpect(element(by.text('Open up App.tsx to start working on your app!'))).toBeVisible();
+    await detoxExpect(
+      element(by.text('Open up App.tsx to start working on your app!'))
+    ).toBeVisible();
   });
 
   it('should navigate through basic app flow', async () => {

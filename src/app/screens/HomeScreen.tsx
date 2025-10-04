@@ -1,11 +1,35 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Text, Button, Card, Badge, Progress } from '../../shared/ui';
 import { spacing } from '../../shared/tokens';
 import { useTheme } from '../../shared/theme';
+import { useLocation } from '../../features/location/hooks/useLocation';
+import { PermissionStatus } from '../../core/ports/location.port';
 
 export const HomeScreen: React.FC = () => {
   const { colors, toggleColorScheme, colorScheme } = useTheme();
+  const {
+    position,
+    permission,
+    isLoading,
+    error,
+    requestPermission,
+    getCurrentPosition,
+  } = useLocation();
+
+  const handleRequestLocation = async () => {
+    try {
+      if (permission?.status !== PermissionStatus.GRANTED) {
+        await requestPermission();
+      }
+      await getCurrentPosition();
+    } catch {
+      Alert.alert(
+        'Standort-Fehler',
+        error?.message || 'Standort konnte nicht abgerufen werden',
+      );
+    }
+  };
 
   return (
     <SafeAreaView
@@ -20,6 +44,53 @@ export const HomeScreen: React.FC = () => {
             Design System Demo
           </Text>
         </View>
+
+        <Card variant="elevated" style={styles.section}>
+          <Text variant="h3" color={colors.text.primary} style={styles.sectionTitle}>
+            Standort
+          </Text>
+          <View style={styles.locationInfo}>
+            <Text variant="bodySmall" color={colors.text.secondary}>
+              Status:{' '}
+              {permission?.status === PermissionStatus.GRANTED
+                ? 'Berechtigt'
+                : permission?.status === PermissionStatus.DENIED
+                  ? 'Verweigert'
+                  : 'Nicht angefragt'}
+            </Text>
+            {position && (
+              <>
+                <Text variant="bodySmall" color={colors.text.secondary}>
+                  Breitengrad: {position.coords.latitude.toFixed(4)}°
+                </Text>
+                <Text variant="bodySmall" color={colors.text.secondary}>
+                  Längengrad: {position.coords.longitude.toFixed(4)}°
+                </Text>
+                {position.coords.accuracy && (
+                  <Text variant="caption" color={colors.text.tertiary}>
+                    Genauigkeit: {position.coords.accuracy.toFixed(0)}m
+                  </Text>
+                )}
+              </>
+            )}
+            {error && (
+              <Text variant="bodySmall" color={colors.error[500]}>
+                Fehler: {error.message}
+              </Text>
+            )}
+          </View>
+          <Button
+            onPress={handleRequestLocation}
+            fullWidth
+            disabled={isLoading}
+          >
+            {isLoading
+              ? 'Lade...'
+              : position
+                ? 'Aktualisieren'
+                : 'Standort abrufen'}
+          </Button>
+        </Card>
 
         <Card variant="elevated" style={styles.section}>
           <Text variant="h3" color={colors.text.primary} style={styles.sectionTitle}>
@@ -147,5 +218,8 @@ const styles = StyleSheet.create({
   },
   typographySection: {
     gap: spacing[3],
+  },
+  locationInfo: {
+    gap: spacing[2],
   },
 });

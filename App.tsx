@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider, useTheme } from './src/shared/theme';
 import { RootNavigator, linking } from './src/app/navigation';
 import { ErrorBoundary } from './src/shared/ui';
+import { DataSourceProvider } from './src/core/providers/DataSourceContext';
+import { FeatureFlags } from './src/core/config/features.config';
 
 function AppContent() {
   const { colorScheme } = useTheme();
+
+  useEffect(() => {
+    FeatureFlags.initialize();
+  }, []);
 
   return (
     <>
@@ -21,9 +27,11 @@ function AppContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
+      <DataSourceProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </DataSourceProvider>
     </ErrorBoundary>
   );
 }

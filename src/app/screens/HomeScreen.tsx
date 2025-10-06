@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Text, Button, Card, Badge, Progress } from '../../shared/ui';
 import { spacing } from '../../shared/tokens';
 import { useTheme } from '../../shared/theme';
 import { useLocation } from '../../features/location/hooks/useLocation';
 import { PermissionStatus } from '../../core/ports/location.port';
+import {
+  MinigameType,
+  Difficulty,
+  MinigameCard,
+  QuestionView,
+  useMinigame,
+} from '../../features/minigames';
 
 export const HomeScreen: React.FC = () => {
   const { colors, toggleColorScheme, colorScheme } = useTheme();
@@ -16,6 +23,9 @@ export const HomeScreen: React.FC = () => {
     requestPermission,
     getCurrentPosition,
   } = useLocation();
+  const { session, result, startGame, answerQuestion, completeGame, resetGame } =
+    useMinigame();
+  const [isGameVisible, setIsGameVisible] = useState(false);
 
   const handleRequestLocation = async () => {
     try {
@@ -29,6 +39,16 @@ export const HomeScreen: React.FC = () => {
         error?.message || 'Standort konnte nicht abgerufen werden',
       );
     }
+  };
+
+  const handleStartGame = (type: MinigameType, difficulty: Difficulty) => {
+    startGame(type, difficulty);
+    setIsGameVisible(true);
+  };
+
+  const handleCloseGame = () => {
+    setIsGameVisible(false);
+    resetGame();
   };
 
   return (
@@ -179,7 +199,57 @@ export const HomeScreen: React.FC = () => {
             </Text>
           </View>
         </Card>
+
+        <Card variant="elevated" style={styles.section}>
+          <Text variant="h3" color={colors.text.primary} style={styles.sectionTitle}>
+            Minispiele
+          </Text>
+          <Text variant="body" color={colors.text.secondary} style={styles.subtitle}>
+            Teste dein Wissen und sammle XP!
+          </Text>
+          <View style={styles.minigamesGrid}>
+            <MinigameCard
+              type={MinigameType.OSM_TRIVIA}
+              difficulty={Difficulty.EASY}
+              onPress={() =>
+                handleStartGame(MinigameType.OSM_TRIVIA, Difficulty.EASY)
+              }
+            />
+            <MinigameCard
+              type={MinigameType.OSM_TRIVIA}
+              difficulty={Difficulty.MEDIUM}
+              onPress={() =>
+                handleStartGame(MinigameType.OSM_TRIVIA, Difficulty.MEDIUM)
+              }
+            />
+            <MinigameCard
+              type={MinigameType.TAG_PUZZLE}
+              difficulty={Difficulty.EASY}
+              onPress={() =>
+                handleStartGame(MinigameType.TAG_PUZZLE, Difficulty.EASY)
+              }
+            />
+            <MinigameCard
+              type={MinigameType.TAG_PUZZLE}
+              difficulty={Difficulty.HARD}
+              onPress={() =>
+                handleStartGame(MinigameType.TAG_PUZZLE, Difficulty.HARD)
+              }
+            />
+          </View>
+        </Card>
       </ScrollView>
+
+      {session && (
+        <QuestionView
+          session={session}
+          onAnswer={answerQuestion}
+          onComplete={completeGame}
+          result={result || undefined}
+          visible={isGameVisible}
+          onClose={handleCloseGame}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -221,5 +291,8 @@ const styles = StyleSheet.create({
   },
   locationInfo: {
     gap: spacing[2],
+  },
+  minigamesGrid: {
+    gap: spacing[3],
   },
 });
